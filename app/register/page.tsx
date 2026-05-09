@@ -104,6 +104,12 @@ export default function RegisterPage() {
                 Đăng nhập
               </Link>
             </p>
+
+            <p className="mt-4 text-center text-sm text-muted-foreground">
+              <Link href="/" className="text-yellow-700 font-medium hover:underline">
+                Trang chủ
+              </Link>
+            </p>
           </CardContent>
         </Card>
       </div>
