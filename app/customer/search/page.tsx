@@ -87,11 +87,13 @@ export default function SearchPage() {
             const facility = facilities.find((f) => f.id === field.facilityId)!;
             const bookedSlots = getBookedSlots(field.id, date);
             return (
-              <Card key={field.id} className="overflow-hidden hover:shadow-md transition-shadow">
+              <Card key={field.id} className="overflow-hidden hover:shadow-md transition-shadow p-0">
                 <CardContent className="p-0">
                   <div className="flex flex-col sm:flex-row">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={field.image} alt={field.name} className="w-full sm:w-48 h-36 object-cover" />
+                    <div className="w-full sm:w-48">
+                      <img src={field.image} alt={field.name} className="size-full object-cover" />
+                    </div>
                     <div className="flex-1 p-4">
                       <div className="flex items-start justify-between gap-2 mb-1">
                         <div>

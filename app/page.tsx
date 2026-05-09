@@ -27,6 +27,50 @@ function shortPrice(n: number): string {
   return (n / 1000).toFixed(0) + "k";
 }
 
+function FootballPitchSvg({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 220 140" xmlns="http://www.w3.org/2000/svg" className={className}>
+      {/* Grass stripes */}
+      <rect width="220" height="140" fill="#1a5c38" rx="4" />
+      {[0,1,2,3,4].map(i => (
+        <rect key={i} x={i * 44} y="0" width="22" height="140" fill="#1e6840" opacity="0.5" />
+      ))}
+      {/* Outer boundary */}
+      <rect x="10" y="10" width="200" height="120" fill="none" stroke="white" strokeWidth="1.5" />
+      {/* Center line */}
+      <line x1="110" y1="10" x2="110" y2="130" stroke="white" strokeWidth="1.5" />
+      {/* Center circle */}
+      <circle cx="110" cy="70" r="22" fill="none" stroke="white" strokeWidth="1.5" />
+      <circle cx="110" cy="70" r="2.5" fill="white" />
+      {/* Left penalty area */}
+      <rect x="10" y="38" width="40" height="64" fill="none" stroke="white" strokeWidth="1.5" />
+      {/* Right penalty area */}
+      <rect x="170" y="38" width="40" height="64" fill="none" stroke="white" strokeWidth="1.5" />
+      {/* Left goal area */}
+      <rect x="10" y="52" width="18" height="36" fill="none" stroke="white" strokeWidth="1.5" />
+      {/* Right goal area */}
+      <rect x="192" y="52" width="18" height="36" fill="none" stroke="white" strokeWidth="1.5" />
+      {/* Left goal */}
+      <rect x="4" y="58" width="7" height="24" fill="none" stroke="rgba(255,255,255,0.7)" strokeWidth="1.5" />
+      {/* Right goal */}
+      <rect x="209" y="58" width="7" height="24" fill="none" stroke="rgba(255,255,255,0.7)" strokeWidth="1.5" />
+      {/* Left penalty arc */}
+      <path d="M 50 55 Q 65 70 50 85" fill="none" stroke="white" strokeWidth="1.5" />
+      {/* Right penalty arc */}
+      <path d="M 170 55 Q 155 70 170 85" fill="none" stroke="white" strokeWidth="1.5" />
+      {/* Corner arcs */}
+      <path d="M 10 14 Q 14 10 18 14" fill="none" stroke="white" strokeWidth="1" />
+      <path d="M 206 14 Q 210 10 210 14" fill="none" stroke="white" strokeWidth="1" />
+      <path d="M 10 126 Q 14 130 18 126" fill="none" stroke="white" strokeWidth="1" />
+      <path d="M 206 126 Q 210 130 210 126" fill="none" stroke="white" strokeWidth="1" />
+      {/* Left penalty spot */}
+      <circle cx="36" cy="70" r="1.5" fill="white" />
+      {/* Right penalty spot */}
+      <circle cx="184" cy="70" r="1.5" fill="white" />
+    </svg>
+  );
+}
+
 export default function HomePage() {
   const { currentUser, isLoading } = useAuth();
   const router = useRouter();
@@ -196,24 +240,38 @@ export default function HomePage() {
               return (
                 <div key={facility.id} className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
                   {/* Facility header */}
-                  <div className="bg-linear-to-r from-green-900 to-green-700 px-5 py-4 flex items-center justify-between flex-wrap gap-2">
-                    <div>
-                      <h3 className="font-semibold text-white">{facility.name}</h3>
-                      <p className="text-xs text-green-200 flex items-center gap-1 mt-0.5">
-                        <MapPin className="w-3 h-3 shrink-0" /> {facility.address}
-                      </p>
+                  <div className="bg-linear-to-r from-green-950 to-green-800 flex items-stretch overflow-hidden">
+                    {/* Info */}
+                    <div className="flex-1 px-5 py-5 flex flex-col justify-center gap-2">
+                      <h3 className="font-bold text-white text-base leading-snug">{facility.name}</h3>
+                      <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-green-300">
+                        <span className="flex items-center gap-1">
+                          <MapPin className="w-3 h-3 shrink-0" /> {facility.address}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Clock className="w-3 h-3" /> {facility.openTime} – {facility.closeTime}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Users className="w-3 h-3" />
+                          {facilityFields.length} sân ·{" "}
+                          <span className="text-green-400 font-medium">
+                            {facilityFields.filter(f => f.status === "Trống").length} trống
+                          </span>
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-1 text-xs text-green-200">
-                      <Clock className="w-3 h-3" /> {facility.openTime} – {facility.closeTime}
+                    {/* Pitch thumbnail */}
+                    <div className="hidden sm:flex items-center pr-5 pl-2 opacity-80">
+                      <FootballPitchSvg className="w-40 h-24 drop-shadow-sm" />
                     </div>
                   </div>
 
                   {/* Schedule grid */}
                   <div className="overflow-x-auto">
-                    <table className="w-full text-xs border-collapse">
+                    <table className="text-xs border-collapse w-max min-w-full">
                       <thead>
                         <tr className="border-b border-gray-100 bg-gray-50/80">
-                          <th className="text-left px-4 py-3 text-gray-500 font-medium min-w-27.5 sticky left-0 bg-gray-50 z-10 border-r border-gray-100">
+                          <th className="text-left px-4 py-3 text-gray-500 font-medium min-w-52 sticky left-0 bg-gray-50 z-10 border-r border-gray-100">
                             Sân
                           </th>
                           {DISPLAY_HOURS.map(h => (
@@ -233,14 +291,25 @@ export default function HomePage() {
                           const isMaintenance = field.status === "Bảo trì";
                           return (
                             <tr key={field.id} className={`border-b border-gray-50 last:border-0 hover:bg-green-50/30 transition-colors ${i % 2 === 1 ? "bg-gray-50/30" : ""}`}>
-                              <td className="px-4 py-3 sticky left-0 bg-inherit z-10 border-r border-gray-100">
-                                <div className="font-semibold text-gray-800">{field.name}</div>
-                                <div className="text-gray-400 mt-0.5">{field.type} người</div>
+                              <td className="px-2 py-2 sticky left-0 z-10 border-r border-gray-100 bg-white/80">
+                                <div className="flex items-center gap-2.5">
+                                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                                  <img
+                                    src={field.image}
+                                    alt={field.name}
+                                    className="w-24 md:w-32 lg:w-64 h-auto object-cover rounded-md shrink-0"
+                                  />
+                                  <div>
+                                    <div className="font-semibold text-gray-800 text-xs md:text-lg leading-tight">{field.name}</div>
+                                    <div className="text-gray-400 text-xs mt-0.5">{field.type} người</div>
+                                    {isMaintenance && <div className="text-orange-500 text-xs mt-0.5">Bảo trì</div>}
+                                  </div>
+                                </div>
                               </td>
                               {DISPLAY_HOURS.map(h => {
                                 if (isMaintenance) {
                                   return (
-                                    <td key={h} className="py-3 text-center">
+                                    <td key={h} className="px-1 py-3 text-center">
                                       <div className="w-6 h-5 rounded mx-auto bg-gray-200" title="Bảo trì" />
                                     </td>
                                   );
