@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Edit, MapPin, Plus } from "lucide-react";
+import { NotificationToast, NotificationState } from "@/components/ui/notification-toast";
 
 type FieldStatus = Field["status"];
 
@@ -20,6 +21,7 @@ export default function ManagerFieldsPage() {
   const [facilityFilter, setFacilityFilter] = useState("all");
   const [editForm, setEditForm] = useState({ basePrice: 0, peakPrice: 0, status: "" as FieldStatus });
   const [newField, setNewField] = useState({ name: "", type: "5" as "5" | "7" | "11", facilityId: "1", basePrice: "", peakPrice: "" });
+  const [notification, setNotification] = useState<NotificationState | null>(null);
 
   const filtered = fieldList.filter((f) => facilityFilter === "all" || f.facilityId === Number(facilityFilter));
 
@@ -32,6 +34,7 @@ export default function ManagerFieldsPage() {
     if (!editing) return;
     setFieldList((prev) => prev.map((f) => f.id === editing.id ? { ...f, ...editForm } : f));
     setEditing(null);
+    setNotification({ type: "success", message: "Đã lưu thay đổi thông tin sân bóng." });
   }
 
   function handleAddField() {
@@ -49,6 +52,7 @@ export default function ManagerFieldsPage() {
     }]);
     setShowAdd(false);
     setNewField({ name: "", type: "5", facilityId: "1", basePrice: "", peakPrice: "" });
+    setNotification({ type: "success", message: "Đã thêm sân mới thành công!" });
   }
 
   const statusBadgeColors: Record<FieldStatus, string> = {
@@ -60,6 +64,7 @@ export default function ManagerFieldsPage() {
 
   return (
     <div className="space-y-6">
+      {notification && <NotificationToast {...notification} onClose={() => setNotification(null)} />}
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-bold">Quản lý Sân bóng</h1>

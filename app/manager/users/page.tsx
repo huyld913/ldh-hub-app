@@ -12,25 +12,26 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Edit, Plus, RefreshCw, UserX } from "lucide-react";
+import { NotificationToast, NotificationState } from "@/components/ui/notification-toast";
 
 export default function ManagerUsersPage() {
   const [userList, setUserList] = useState<User[]>(users);
   const [selected, setSelected] = useState<User | null>(null);
   const [showAdd, setShowAdd] = useState(false);
   const [newStaff, setNewStaff] = useState({ name: "", email: "", phone: "", facilityId: "1" });
-  const [resetMsg, setResetMsg] = useState<number | null>(null);
+  const [notification, setNotification] = useState<NotificationState | null>(null);
 
   const staff = userList.filter((u) => u.role === "staff");
   const customers = userList.filter((u) => u.role === "customer");
 
   function handleResetPassword(userId: number) {
-    setResetMsg(userId);
-    setTimeout(() => setResetMsg(null), 2500);
+    setNotification({ type: "success", message: "Đã reset mật khẩu thành công!" });
   }
 
   function handleDeactivate(userId: number) {
     setUserList((prev) => prev.filter((u) => u.id !== userId));
     setSelected(null);
+    setNotification({ type: "success", message: "Đã thu hồi tài khoản nhân viên." });
   }
 
   function handleAddStaff() {
@@ -48,6 +49,7 @@ export default function ManagerUsersPage() {
     }]);
     setShowAdd(false);
     setNewStaff({ name: "", email: "", phone: "", facilityId: "1" });
+    setNotification({ type: "success", message: "Đã thêm nhân viên mới thành công!" });
   }
 
   function getInitials(name: string) {
@@ -67,7 +69,6 @@ export default function ManagerUsersPage() {
             {u.facility && <p className="text-xs text-muted-foreground">{u.facility.replace("LDH Football Hub – ", "")}</p>}
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            {resetMsg === u.id && <span className="text-xs text-green-600">Đã reset!</span>}
             <Button variant="ghost" size="sm" onClick={() => handleResetPassword(u.id)} title="Reset mật khẩu">
               <RefreshCw className="w-3.5 h-3.5" />
             </Button>
@@ -82,6 +83,7 @@ export default function ManagerUsersPage() {
 
   return (
     <div className="space-y-6">
+      {notification && <NotificationToast {...notification} onClose={() => setNotification(null)} />}
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-bold">Quản lý Nhân sự & Người dùng</h1>

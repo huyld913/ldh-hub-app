@@ -9,11 +9,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { CalendarDays, Percent, Plus, Tag, Trash2 } from "lucide-react";
+import { NotificationToast, NotificationState } from "@/components/ui/notification-toast";
 
 export default function ManagerPromotionsPage() {
   const [promoList, setPromoList] = useState<Promotion[]>(promotions);
   const [showAdd, setShowAdd] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
+  const [notification, setNotification] = useState<NotificationState | null>(null);
   const [form, setForm] = useState({
     code: "", discountPercent: "", maxDiscount: "", minOrder: "", usesLeft: "", startDate: "", endDate: "",
   });
@@ -33,14 +35,20 @@ export default function ManagerPromotionsPage() {
     }]);
     setShowAdd(false);
     setForm({ code: "", discountPercent: "", maxDiscount: "", minOrder: "", usesLeft: "", startDate: "", endDate: "" });
+    setNotification({ type: "success", message: "Đã tạo mã khuyến mãi thành công!" });
   }
 
   function handleDelete() {
-    if (deleteId) { setPromoList((prev) => prev.filter((p) => p.id !== deleteId)); setDeleteId(null); }
+    if (deleteId) {
+      setPromoList((prev) => prev.filter((p) => p.id !== deleteId));
+      setDeleteId(null);
+      setNotification({ type: "success", message: "Đã xóa mã khuyến mãi." });
+    }
   }
 
   return (
     <div className="space-y-6">
+      {notification && <NotificationToast {...notification} onClose={() => setNotification(null)} />}
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-bold">Quản lý Khuyến mãi</h1>

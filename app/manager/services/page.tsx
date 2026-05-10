@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { AlertTriangle, Edit, Package, Plus, Trash2 } from "lucide-react";
+import { NotificationToast, NotificationState } from "@/components/ui/notification-toast";
 
 export default function ManagerServicesPage() {
   const [svcList, setSvcList] = useState<Service[]>(services);
@@ -19,6 +20,7 @@ export default function ManagerServicesPage() {
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [editForm, setEditForm] = useState({ name: "", price: 0, stock: 0 });
   const [newSvc, setNewSvc] = useState({ name: "", category: "Nước uống" as Service["category"], price: "", stock: "", unit: "", facilityId: "1" });
+  const [notification, setNotification] = useState<NotificationState | null>(null);
 
   const filtered = svcList.filter((s) => facilityFilter === "all" || s.facilityId === Number(facilityFilter));
   const lowStock = filtered.filter((s) => s.stock < 10);
@@ -32,6 +34,7 @@ export default function ManagerServicesPage() {
     if (!editing) return;
     setSvcList((prev) => prev.map((s) => s.id === editing.id ? { ...s, ...editForm } : s));
     setEditing(null);
+    setNotification({ type: "success", message: "Đã lưu thay đổi dịch vụ thành công." });
   }
 
   function handleAdd() {
@@ -42,10 +45,15 @@ export default function ManagerServicesPage() {
     }]);
     setShowAdd(false);
     setNewSvc({ name: "", category: "Nước uống", price: "", stock: "", unit: "", facilityId: "1" });
+    setNotification({ type: "success", message: "Đã thêm dịch vụ mới thành công!" });
   }
 
   function handleDelete() {
-    if (deleteId) { setSvcList((prev) => prev.filter((s) => s.id !== deleteId)); setDeleteId(null); }
+    if (deleteId) {
+      setSvcList((prev) => prev.filter((s) => s.id !== deleteId));
+      setDeleteId(null);
+      setNotification({ type: "success", message: "Đã xóa dịch vụ." });
+    }
   }
 
   const categoryColor: Record<Service["category"], string> = {
@@ -56,6 +64,7 @@ export default function ManagerServicesPage() {
 
   return (
     <div className="space-y-6">
+      {notification && <NotificationToast {...notification} onClose={() => setNotification(null)} />}
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-bold">Quản lý Dịch vụ</h1>

@@ -10,12 +10,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { CalendarDays, Clock, MapPin, QrCode, XCircle } from "lucide-react";
 import QRCode from "react-qr-code";
+import { NotificationToast, NotificationState } from "@/components/ui/notification-toast";
 
 export default function BookingsPage() {
   const { currentUser } = useAuth();
   const [cancelId, setCancelId] = useState<number | null>(null);
   const [cancelledIds, setCancelledIds] = useState<number[]>([]);
   const [qrBookingId, setQrBookingId] = useState<number | null>(null);
+  const [notification, setNotification] = useState<NotificationState | null>(null);
 
   const qrBooking = bookings.find(b => b.id === qrBookingId) ?? null;
 
@@ -28,7 +30,11 @@ export default function BookingsPage() {
   const history = myBookings.filter((b) => ["Hoàn thành", "Đã hủy"].includes(b.status));
 
   function confirmCancel() {
-    if (cancelId) { setCancelledIds([...cancelledIds, cancelId]); setCancelId(null); }
+    if (cancelId) {
+      setCancelledIds([...cancelledIds, cancelId]);
+      setCancelId(null);
+      setNotification({ type: "success", message: "Đã hủy đặt sân thành công." });
+    }
   }
 
   function canCancel(b: (typeof myBookings)[0]) {
@@ -81,6 +87,7 @@ export default function BookingsPage() {
 
   return (
     <div className="space-y-6">
+      {notification && <NotificationToast {...notification} onClose={() => setNotification(null)} />}
       <div>
         <h1 className="text-2xl font-bold">Lịch sử đặt sân</h1>
         <p className="text-muted-foreground text-sm mt-1">Quản lý các đặt sân của bạn</p>

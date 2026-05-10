@@ -8,15 +8,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { CheckCircle2, Star } from "lucide-react";
+import { Star } from "lucide-react";
+import { NotificationToast, NotificationState } from "@/components/ui/notification-toast";
 
 export default function ProfilePage() {
   const { currentUser } = useAuth();
   const [form, setForm] = useState({ name: currentUser?.name ?? "", phone: currentUser?.phone ?? "", email: currentUser?.email ?? "" });
   const [pwForm, setPwForm] = useState({ current: "", newPw: "", confirm: "" });
-  const [saved, setSaved] = useState(false);
-  const [pwSaved, setPwSaved] = useState(false);
   const [pwError, setPwError] = useState("");
+  const [notification, setNotification] = useState<NotificationState | null>(null);
 
   const totalBookings = bookings.filter((b) => b.customerId === currentUser?.id).length;
   const completedBookings = bookings.filter((b) => b.customerId === currentUser?.id && b.status === "Hoàn thành").length;
@@ -26,8 +26,7 @@ export default function ProfilePage() {
   async function handleSaveProfile(e: React.FormEvent) {
     e.preventDefault();
     await new Promise((r) => setTimeout(r, 400));
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    setNotification({ type: "success", message: "Đã lưu thông tin cá nhân thành công!" });
   }
 
   async function handleChangePw(e: React.FormEvent) {
@@ -37,13 +36,13 @@ export default function ProfilePage() {
     if (pwForm.newPw.length < 6) { setPwError("Mật khẩu mới tối thiểu 6 ký tự."); return; }
     if (pwForm.newPw !== pwForm.confirm) { setPwError("Mật khẩu xác nhận không khớp."); return; }
     await new Promise((r) => setTimeout(r, 400));
-    setPwSaved(true);
     setPwForm({ current: "", newPw: "", confirm: "" });
-    setTimeout(() => setPwSaved(false), 2000);
+    setNotification({ type: "success", message: "Đã đổi mật khẩu thành công!" });
   }
 
   return (
     <div className="max-w-2xl space-y-6">
+      {notification && <NotificationToast {...notification} onClose={() => setNotification(null)} />}
       <div>
         <h1 className="text-2xl font-bold">Tài khoản của tôi</h1>
         <p className="text-muted-foreground text-sm mt-1">Quản lý thông tin cá nhân</p>
@@ -97,7 +96,6 @@ export default function ProfilePage() {
             </div>
             <div className="flex items-center gap-3">
               <Button type="submit" className="bg-green-700 hover:bg-green-800">Lưu thay đổi</Button>
-              {saved && <span className="text-green-600 text-sm flex items-center gap-1"><CheckCircle2 className="w-4 h-4" />Đã lưu!</span>}
             </div>
           </form>
         </CardContent>
@@ -125,7 +123,6 @@ export default function ProfilePage() {
             {pwError && <p className="text-xs text-red-600">{pwError}</p>}
             <div className="flex items-center gap-3">
               <Button type="submit" variant="outline">Đổi mật khẩu</Button>
-              {pwSaved && <span className="text-green-600 text-sm flex items-center gap-1"><CheckCircle2 className="w-4 h-4" />Đã cập nhật!</span>}
             </div>
           </form>
         </CardContent>

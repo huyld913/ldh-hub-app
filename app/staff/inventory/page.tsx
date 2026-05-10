@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
 import { AlertTriangle, Package, Plus } from "lucide-react";
+import { NotificationToast, NotificationState } from "@/components/ui/notification-toast";
 
 const FACILITY_ID = 1; // Staff assigned to Quận 7
 
@@ -17,16 +18,19 @@ export default function InventoryPage() {
   const [editing, setEditing] = useState<Service | null>(null);
   const [addQty, setAddQty] = useState(0);
   const [showAdd, setShowAdd] = useState(false);
+  const [notification, setNotification] = useState<NotificationState | null>(null);
 
   const myItems = inventory.filter((s) => s.facilityId === FACILITY_ID);
   const lowStock = myItems.filter((s) => s.stock < 10);
 
   function handleAddStock() {
     if (!editing || addQty <= 0) return;
+    const itemName = editing.name;
     setInventory((prev) => prev.map((s) => s.id === editing.id ? { ...s, stock: s.stock + addQty } : s));
     setEditing(null);
     setAddQty(0);
     setShowAdd(false);
+    setNotification({ type: "success", message: `Đã nhập thêm ${addQty} ${editing.unit} ${itemName} thành công!` });
   }
 
   function getStockLevel(s: Service): { color: string; label: string } {
@@ -37,6 +41,7 @@ export default function InventoryPage() {
 
   return (
     <div className="space-y-6">
+      {notification && <NotificationToast {...notification} onClose={() => setNotification(null)} />}
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-bold">Quản lý Kho vật tư</h1>

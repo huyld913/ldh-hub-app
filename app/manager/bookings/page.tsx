@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { CalendarDays, Clock, MapPin, Phone, Search } from "lucide-react";
+import { NotificationToast, NotificationState } from "@/components/ui/notification-toast";
 
 type BookingStatus = Booking["status"];
 
@@ -19,6 +20,7 @@ export default function ManagerBookingsPage() {
   const [bookingList, setBookingList] = useState<Booking[]>(bookings);
   const [selected, setSelected] = useState<Booking | null>(null);
   const [newStatus, setNewStatus] = useState<BookingStatus | "">("");
+  const [notification, setNotification] = useState<NotificationState | null>(null);
 
   const filtered = bookingList.filter((b) => {
     const matchSearch =
@@ -38,6 +40,7 @@ export default function ManagerBookingsPage() {
   function handleUpdateStatus() {
     if (!selected || !newStatus) return;
     setBookingList((prev) => prev.map((b) => b.id === selected.id ? { ...b, status: newStatus as BookingStatus } : b));
+    setNotification({ type: "success", message: `Đã cập nhật trạng thái đơn #${selected.id} thành "${newStatus}".` });
     setSelected(null);
     setNewStatus("");
   }
@@ -52,6 +55,7 @@ export default function ManagerBookingsPage() {
 
   return (
     <div className="space-y-6">
+      {notification && <NotificationToast {...notification} onClose={() => setNotification(null)} />}
       <div>
         <h1 className="text-2xl font-bold">Quản lý Đơn đặt sân</h1>
         <p className="text-muted-foreground text-sm mt-1">Giám sát toàn bộ đơn đặt sân trên hệ thống</p>
